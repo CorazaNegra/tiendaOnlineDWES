@@ -21,6 +21,11 @@
         echo "Error: " . $e->getMessage(); 
     }
 
+    $rolesPermitidos = ['admin', 'empleado'];
+
+    // Verificar autenticación y roles permitidos
+    verificarAutenticacion($rolesPermitidos);
+
     actualizarCategoria($con);
 ?>
 
@@ -50,9 +55,25 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="catPadre">Cod. Categoría Padre: </label>
-                    <input class="form-control" type="text" name="catPadre" pattern="[0-9]+" maxlength="11" value="<?php echo $res[3] ?>"> 
+                    <label for="catPadre" class="my-1 mr-2">Categoría Padre:</label>
+                    <select class="form-control" id="catPadre" name="catPadre">
+                        <option value="">Sin Categoría Padre</option> <!-- Opción por defecto sin categoría padre -->
+                        <?php 
+                        $query = "SELECT codigo, nombre FROM categorias WHERE codigo != :codigo AND (codCategoriaPadre IS NULL OR codigo = :codigo)";
+                        $stmt = $con->prepare($query);
+                        $stmt->bindParam(':codigo', $res[0], PDO::PARAM_INT); 
+                        $stmt->execute();
+                        $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                        foreach ($categorias as $categoria) {
+                            $selected = ($categoria['codigo'] == $res[3]) ? 'selected' : '';
+                            echo "<option value='" . $categoria['codigo'] . "' $selected>" . $categoria['nombre'] . "</option>";
+                        }
+                        ?>
+                    </select>
                 </div>
+                
+                <br>
                 
                 <div class="form-group">
                     <input type="submit" class="btn btn-block" value="Enviar" style="background-color: #487317; color: white;">

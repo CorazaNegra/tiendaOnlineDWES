@@ -44,6 +44,11 @@
         $mensaje = $_GET["mensaje"];
     }
 
+    $rolesPermitidos = ['admin', 'empleado'];
+
+    // Verificar autenticación y roles permitidos
+    verificarAutenticacion($rolesPermitidos);
+
     buscarArticulos($con);
     bajaArticulo($con);
     
@@ -175,7 +180,7 @@
             <?php
                 if ($total_paginas > 1) {
                     for ($i = 1; $i <= $total_paginas; $i++) {
-                        $activo = ($i == $pagina) ? "class='activo'" : "";
+                        $activo = ($i == $pagina) ? "style='color: black;'" : "style='color: #487317;'";
                         echo "<a href='articulos.php?pagina=$i' $activo>$i</a> ";
                     }
                 }

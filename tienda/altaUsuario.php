@@ -28,7 +28,7 @@
 
     gestionarGET('fallo', $fallo);
     gestionarGET('nombre', $nombre);
-    gestionarGET('nombre', $apellidos);
+    gestionarGET('apellido', $apellidos);
     gestionarGET('direccion', $direccion);
     gestionarGET('localidad', $localidad);
     gestionarGET('provincia', $provincia);

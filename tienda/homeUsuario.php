@@ -26,6 +26,11 @@ $con = conectar_pdo();
         $datos="Mis Datos";
         $pedidos="Mis Pedidos";
     }
+
+    $rolesPermitidos = ['admin', 'empleado', 'usuario'];
+
+    // Verificar autenticación y roles permitidos
+    verificarAutenticacion($rolesPermitidos);
     
 
 ?>

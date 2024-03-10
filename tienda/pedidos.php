@@ -55,7 +55,12 @@
         }
     }
 
-    buscarPedido($con);
+    $rolesPermitidos = ['admin', 'empleado', 'usuario'];
+
+    // Verificar autenticación y roles permitidos
+    verificarAutenticacion($rolesPermitidos);
+
+    buscarPedido($con, $rol, $dni);
     actualizarPedido($con);
 ?>
 
@@ -123,16 +128,15 @@
             }
             
             if (isset($order)){
-                $resultados = (isset($_SESSION['resultados_busqueda_pedidos'])) ? $_SESSION['resultados_busqueda_pedidos'] : (new Pedido($con))->obtenerPedidosOrdenados($con, $order);
-                $num_total_registros = count($resultados);
-                $total_paginas = ceil($num_total_registros / $PAGS);
-                $result_pagina = array_slice($resultados, $inicio, $PAGS);
+                $resultados = (isset($_SESSION['resultados_busqueda_pedidos'])) ? $_SESSION['resultados_busqueda_pedidos'] : (new Pedido($con, $rol, $dni))->obtenerPedidosOrdenados($order);
+                
             }else {
-                $resultados = (isset($_SESSION['resultados_busqueda_pedidos'])) ? $_SESSION['resultados_busqueda_pedidos'] : (new Pedido($con))->obtenerPedidos();
-                $num_total_registros = count($resultados);
-                $total_paginas = ceil($num_total_registros / $PAGS);
-                $result_pagina = array_slice($resultados, $inicio, $PAGS);
+                $resultados = (isset($_SESSION['resultados_busqueda_pedidos'])) ? $_SESSION['resultados_busqueda_pedidos'] : (new Pedido($con, $rol, $dni))->obtenerPedidos();
+
             }
+            $num_total_registros = count($resultados);
+            $total_paginas = ceil($num_total_registros / $PAGS);
+            $result_pagina = array_slice($resultados, $inicio, $PAGS);
             // $resultados = (isset($_SESSION['resultados_busqueda'])) ? $_SESSION['resultados_busqueda'] : (new Articulo($con))->obtenerArticulos();
             // $num_total_registros = count($resultados);
             // $total_paginas = ceil($num_total_registros / $PAGS);
@@ -193,7 +197,7 @@
     <?php
             if ($total_paginas > 1) {
                 for ($i = 1; $i <= $total_paginas; $i++) {
-                    $activo = ($i == $pagina) ? "class='activo'" : "";
+                    $activo = ($i == $pagina) ? "style='color: black;'" : "style='color: #487317;'";
                     echo "<a href='pedidos.php?pagina=$i' $activo>$i</a> ";
                 }
             }

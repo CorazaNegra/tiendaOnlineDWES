@@ -153,9 +153,24 @@ function insertarCliente($con) {
             $stmt->execute([$dni]);
 
             if ($stmt->rowCount() > 0) {
+                $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($usuario['activo'] == 0) {
+                    // Si el usuario está inactivo, actualizar todos los campos y cambiar su estado a activo
+                    
+                    // Cifrar la contraseña
+                    $claveHash = password_hash($clave, PASSWORD_DEFAULT);
 
-                header("Location: altaUsuario.php?dni=$dni&nombre=$nombre&apellidos=$apellidos&direccion=$direccion&localidad=$localidad&provincia=$provincia&telefono=$telefono&email=$email&clave_usuario=$clave");
-            
+                    $stmtUpdate = $con->prepare("UPDATE usuarios SET nombre = ?, apellidos = ?, direccion = ?, localidad = ?, provincia = ?, telefono = ?, email = ?, clave_usuario = ?, activo = 1 WHERE dni = ?");
+                    $stmtUpdate->execute([$nombre, $apellidos, $direccion, $localidad, $provincia, $telefono, $email, $claveHash, $dni]);
+                    // Redirigir al usuario a alguna página, como el panel de usuario, por ejemplo
+                    $mensaje = "Bienvenido de nuevo ".$nombre.", puede iniciar sesión";
+                    header("Location: registro.php?mensaje=$mensaje");
+                    exit();
+                } else {
+                    // Si el usuario ya está activo, redirigir a una página de error o mostrar un mensaje
+                    header("Location: altaUsuario.php?dni=$dni&nombre=$nombre&apellidos=$apellidos&direccion=$direccion&localidad=$localidad&provincia=$provincia&telefono=$telefono&email=$email&clave_usuario=$clave&error=usuario_activo");
+                    exit();
+                }
             } else {
                 // Cifrar la contraseña
                 $claveHash = password_hash($clave, PASSWORD_DEFAULT);
@@ -173,11 +188,9 @@ function insertarCliente($con) {
                         header("Location: registro.php?alta=$mensaje");
                         exit();
                     }
-                    
-                    
                 } else {
                     header("Location: altaUsuario.php");
-       
+                    exit();
                 }
             }
         } catch (PDOException $e) {
@@ -185,6 +198,7 @@ function insertarCliente($con) {
         }
     }
 }
+
 
 function insertarClienteAdmin($con) {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -244,6 +258,11 @@ function insertarCategoria($con) {
         $nombre = $_POST["nombre"];
         $activo = $_POST["activo"];
         $codCategoriaPadre = $_POST["codCategoriaPadre"];
+
+        // Verifica si el valor de codCategoriaPadre es una cadena vacía y lo establece como NULL si es así
+        if ($codCategoriaPadre === '') {
+            $codCategoriaPadre = NULL;
+        }
 
         try {
             // Preparar la consulta para insertar una nueva categoría
@@ -822,12 +841,28 @@ function buscarArticulosIndex($con) {
         $nombre = $_POST["busqueda"];
         $rol = $_SESSION['rol'];
         try {
-            // Utilizar una sentencia preparada para evitar la inyección de SQL
-            $stmt = $con->prepare("SELECT * FROM articulos WHERE nombre = :nombre");
-            $stmt->bindParam(':nombre', $nombre);
+            
+            $stmt = $con->prepare(" SELECT * FROM articulos
+                                    WHERE LOWER(nombre) LIKE LOWER(:nombre) 
+                                    AND activo = :activo 
+                                    AND categoria IN (
+                                        SELECT codigo 
+                                        FROM categorias 
+                                        WHERE activo = :activo 
+                                        AND codCategoriaPadre IN (
+                                            SELECT codigo 
+                                            FROM categorias 
+                                            WHERE activo = :activo)
+                                    );
+                                ");
+            $nombreParam = "%$nombre%";
+            $activo = 1;
+            $stmt->bindParam(':nombre', $nombreParam);
+            $stmt->bindParam(':activo', $activo, PDO::PARAM_INT);
             $stmt->execute();
-    
+
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     
             if ($result) {
                 // Verificar si el artículo está activo
@@ -886,27 +921,34 @@ function buscarCategoria($con) {
     }
 }
 
-function buscarPedido($con) {
+function buscarPedido($con, $rol, $dni) {
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["id"])) {
         $idPedido = $_POST["id"];
         try {
-            // Utilizar una sentencia preparada para evitar la inyección de SQL
-            $stmt = $con->prepare("SELECT * FROM pedidos WHERE idPedido = :idPedido");
-            $stmt->bindParam(':idPedido', $idPedido);
-            $stmt->execute();
-    
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+            $query = "";
+
+            if ($rol === 'usuario') {
+                // Si el rol es usuario, solo busca el pedido del usuario correspondiente
+                $query = $con->prepare("SELECT * FROM pedidos WHERE idPedido = :idPedido AND codUsuario = :dni");
+                $query->bindParam(':idPedido', $idPedido);
+                $query->bindParam(':dni', $dni);
+            } else {
+                // Si el rol es admin o empleado, busca cualquier pedido por su id
+                $query = $con->prepare("SELECT * FROM pedidos WHERE idPedido = :idPedido");
+                $query->bindParam(':idPedido', $idPedido);
+            }
+
+            $query->execute();
+            $result = $query->fetchAll(PDO::FETCH_ASSOC);
+
             if ($result) {
                 // Se encontraron resultados
                 session_start(); 
                 $_SESSION['resultados_busqueda_pedidos'] = $result;
                 header("Location: pedidos.php");
-                
             } else {
-                $mensaje = "No se encontró el pedido con idPedido: $idPedido";
+                $mensaje = "No se encontró el pedido con Id Pedido: $idPedido";
                 header("Location: pedidos.php?buscar=$mensaje");
-                //echo "No se encontró al cliente con el DNI: $dni";
             }
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();

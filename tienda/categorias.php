@@ -14,7 +14,7 @@
     $con = conectar_pdo();
     $order = isset($_GET['order']) ? $_GET['order'] : 'asc';
 
-    $PAGS = 3;
+    $PAGS = 4;
     $pagina = isset($_GET["pagina"]) ? $_GET["pagina"] : 1;
     $inicio = ($pagina - 1) * $PAGS;
 
@@ -44,6 +44,11 @@
         }
     }
 
+    $rolesPermitidos = ['admin', 'empleado'];
+
+    // Verificar autenticación y roles permitidos
+    verificarAutenticacion($rolesPermitidos);
+
     buscarCategoria($con);
     insertarCategoria($con);
     bajaCategoria($con);
@@ -62,7 +67,7 @@
                 <tr>
                     <td class="align-middle"> <!-- Añadido -->
                         <form class="form-inline justify-content-center" id="ordenar" method="get">
-                            <label class="my-1 mr-2" for="order">Nombre:</label>
+                            <label class="my-1 mr-2" for="order">Código:</label>
                             <select class="custom-select my-1 mr-sm-2" id="order" name="order">
                                 <option value="asc" <?php echo ($order === 'asc') ? 'selected' : ''; ?>>Ascendente</option>
                                 <option value="desc" <?php echo ($order === 'desc') ? 'selected' : ''; ?>>Descendente</option>
@@ -83,7 +88,7 @@
     </div>
 </div>
 
-<div class="row justify-content-center mt-4">
+<div class="row justify-content-center mt-2">
     <div class="col text-center">
         <h2 style="color: #487317;">Añadir Categoría</h2>
         <hr>
@@ -111,21 +116,23 @@
                         </div>
                     </td>
                     <td class="align-middle">
-                        <div class="form-group mr-2 mb-2">
-                            <label for="codCategoriaPadre" class="my-1 mr-2">Categoría Padre:</label>
-                            <select class="form-control form-control-sm my-1 mr-sm-2 mt-2" id="codCategoriaPadre" name="codCategoriaPadre">
-                                <?php 
-                                    $query = "SELECT codigo, nombre FROM categorias WHERE codCategoriaPadre IS NULL";
-                                    $stmt = $con->prepare($query);
-                                    $stmt->execute();
-                                    $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    <div class="form-group mr-2 mb-2">
+                        <label for="codCategoriaPadre" class="my-1 mr-2">Categoría Padre:</label>
+                        <select class="form-control form-control-sm my-1 mr-sm-2 mt-2" id="codCategoriaPadre" name="codCategoriaPadre">
+                            <option value="">Sin Categoría Padre</option> <!-- Opción por defecto sin categoría padre -->
+                            <?php 
+                                $query = "SELECT codigo, nombre FROM categorias WHERE codCategoriaPadre IS NULL";
+                                $stmt = $con->prepare($query);
+                                $stmt->execute();
+                                $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                                    foreach ($categorias as $categoria) {
-                                        echo "<option value='" . $categoria['codigo'] . "'>" . $categoria['nombre'] . "</option>";
-                                    }
-                                ?>
-                            </select>
-                        </div>
+                                foreach ($categorias as $categoria) {
+                                    echo "<option value='" . $categoria['codigo'] . "'>" . $categoria['nombre'] . "</option>";
+                                }
+                            ?>
+                        </select>
+                    </div>
+
                     </td>
                     <td class="align-middle">
                         <button type="submit" class="btn btn-sm my-1 mr-sm-2 mb-2" style="background-color: #487317; color: white;">Guardar</button>
@@ -200,7 +207,24 @@
                 echo "<button class='btn btn-sm' type='submit' style='background-color: #487317; color: white;'>Actualizar</button>";
                 echo "</form>";
                 echo "</td>";
-                echo "<td>{$res["codCategoriaPadre"]}</td>";
+
+                // Obtener la información de la categoría padre
+                $codCategoriaPadre = $res["codCategoriaPadre"];
+                $categoriaPadre = null;
+
+                if ($codCategoriaPadre !== null) {
+                    $stmt = $con->prepare("SELECT codigo, nombre FROM categorias WHERE codigo = ?");
+                    $stmt->execute([$codCategoriaPadre]);
+                    $categoriaPadre = $stmt->fetch(PDO::FETCH_ASSOC);
+                }
+
+                // Imprimir el código y el nombre de la categoría padre si está disponible
+                if ($categoriaPadre !== null) {
+                    echo "<td>{$categoriaPadre['codigo']} - {$categoriaPadre['nombre']}</td>";
+                } else {
+                    echo "<td>Sin categoría padre</td>";
+                }
+
                 echo "<td class='text-center'><a href='editarCategoria.php?codigo_categoria={$res['codigo']}'><i class='far fa-edit fa-lg' style='color: #487317;'></a></td>";
                 echo "</tr>";
             }
@@ -216,7 +240,7 @@
             <?php
                 if ($total_paginas > 1) {
                     for ($i = 1; $i <= $total_paginas; $i++) {
-                        $activo = ($i == $pagina) ? "class='activo'" : "";
+                        $activo = ($i == $pagina) ? "style='color: black;'" : "style='color: #487317;'";
                         echo "<a href='categorias.php?pagina=$i' $activo>$i</a> ";
                     }
                 }

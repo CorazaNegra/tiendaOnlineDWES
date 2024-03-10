@@ -23,6 +23,11 @@ if(isset ($_GET["mensaje"])){
     $mensaje = $_GET["mensaje"];
 }
 
+$rolesPermitidos = ['admin', 'empleado', 'usuario'];
+
+// Verificar autenticación y roles permitidos
+verificarAutenticacion($rolesPermitidos);
+
 ?>
 
 <div class="row justify-content-center">

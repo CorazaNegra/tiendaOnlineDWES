@@ -24,7 +24,7 @@
         }
 
         public function obtenerCategoriasOrdenados($con, $order) {
-            $stmt = $con->prepare("SELECT * FROM categorias ORDER BY nombre $order");
+            $stmt = $con->prepare("SELECT * FROM categorias ORDER BY codigo $order");
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }

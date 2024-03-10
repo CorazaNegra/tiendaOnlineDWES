@@ -37,7 +37,7 @@ $enlaceDatos = ($rol === 'admin') ? 'administrador.php' : 'empleadoUsuario.php';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
 
     <link rel="stylesheet" href="style.css">
-    <title>Document</title>
+    <title>VidaParaCasa</title>
 </head>
 <body>
     <div id="contenedor"> 
@@ -114,47 +114,46 @@ $enlaceDatos = ($rol === 'admin') ? 'administrador.php' : 'empleadoUsuario.php';
             </div>
         </div> 
         <div id="cuerpo"> 
-        <div id="lateral">
-            <div id="menu">
-                <div class="row" style="height: 600px;">
-                    <div class="col-9">
-                    <ul>
-                    <li><a href="index.php?categoria=1">Plantas de Exterior</a>
-                    <ul style="--cantidad-items: 6">
-                            <li><a href="index.php?categoria=6">Acuáticas</a></li>
-                            <li><a href="index.php?categoria=7">Arbustos</a></li>
-                            <li><a href="index.php?categoria=8">Aromáticas</a></li>
-                            <li><a href="index.php?categoria=9">Bulbos</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="index.php?categoria=2">Plantas de Interior</a>
-                        <ul style="--cantidad-items: 6">
-                            <li><a href="index.php?categoria=10">Aglaonemas</a></li>
-                            <li><a href="index.php?categoria=11">Alocasias</a></li>
-                            <li><a href="index.php?categoria=12">Calatheas</a></li>
-                            <li><a href="index.php?categoria=13">Colgantes</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="index.php?categoria=3">Macetas</a>
-                    <ul style="--cantidad-items: 5">
-                            <li><a href="index.php?categoria=14">Macetas Barro</a></li>
-                            <li><a href="index.php?categoria=15">Macetas EcoFriendly</a></li>
-                            <li><a href="index.php?categoria=16">Macetas plástico</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="index.php?categoria=4">Accesorios Jardín</a>
-                        <ul style="--cantidad-items: 6">
-                            <li><a href="index.php?categoria=17">Abonos</a></li>
-                            <li><a href="index.php?categoria=18">Accesorios de Riego</a></li>
-                            <li><a href="index.php?categoria=19">Herramientes</a></li>
-                            <li><a href="index.php?categoria=20">Insecticidas</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="index.php?categoria=5">Otros</a></li>
-                    </ul>
+            <div id="lateral">
+                <div id="menu">
+                    <div class="row" style="height: 700px;">
+                        <div class="col-9">
+                            <ul>
+                                <?php
+
+                                $con = conectar_pdo();
+
+                                // Consulta las categorías principales (sin categoría padre)
+                                $query = "SELECT codigo, nombre FROM categorias WHERE codCategoriaPadre IS NULL AND activo = 1";
+                                $stmt = $con->prepare($query);
+                                $stmt->execute();
+                                $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                                foreach ($categorias as $categoria) {
+                                    echo "<li><a href='index.php?categoria=" . $categoria['codigo'] . "'>" . $categoria['nombre'] . "</a>";
+
+                                    // Consultar las subcategorías activas para esta categoría
+                                    $query_sub = "SELECT codigo, nombre FROM categorias WHERE codCategoriaPadre = :codigo_padre AND activo = 1";
+                                    $stmt_sub = $con->prepare($query_sub);
+                                    $stmt_sub->bindParam(':codigo_padre', $categoria['codigo']);
+                                    $stmt_sub->execute();
+                                    $subcategorias = $stmt_sub->fetchAll(PDO::FETCH_ASSOC);
+
+                                    // Si hay subcategorías, las muestra en el menú desplegable
+                                    if ($subcategorias) {
+                                        echo "<ul style='--cantidad-items: " . count($subcategorias) . "'>";
+                                        foreach ($subcategorias as $subcategoria) {
+                                            echo "<li><a href='index.php?categoria=" . $subcategoria['codigo'] . "'>" . $subcategoria['nombre'] . "</a></li>";
+                                        }
+                                        echo "</ul>";
+                                    }
+                                    echo "</li>";
+                                }
+                                ?>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-                
+                </div>   
             </div>
         </div> 
         <div id="otrolado"> 

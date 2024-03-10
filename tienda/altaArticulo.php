@@ -70,6 +70,22 @@
         $mensaje = $_GET["mensaje"];
     }
 
+    try{
+
+        // Consulta para obtener todas las categorías
+        $stmtCategorias = $con->prepare("SELECT codigo, nombre FROM categorias");
+        $stmtCategorias->execute();
+        $categorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
+
+    } catch(PDOException $e){
+        echo "Error: " . $e->getMessage(); 
+    }
+
+    $rolesPermitidos = ['admin', 'empleado'];
+
+    // Verificar autenticación y roles permitidos
+    verificarAutenticacion($rolesPermitidos);
+
     insertarArticulo($con);
 
 ?>
@@ -98,28 +114,13 @@
 
             <label for="categoria">Categoría:</label>
             <select class="form-control" name="categoria" required>
-                <option value="" disabled <?php echo empty($categoria) ? 'selected' : ''; ?>>Elegir categoría</option>
-                <option value="1" <?php echo ($categoria == '1') ? 'selected' : ''; ?>>Plantas de Exteriro</option>
-                <option value="2" <?php echo ($categoria == '2') ? 'selected' : ''; ?>>Plantas de Interior</option>
-                <option value="3" <?php echo ($categoria == '3') ? 'selected' : ''; ?>>Macetas</option>
-                <option value="4" <?php echo ($categoria == '4') ? 'selected' : ''; ?>>Accesorios Jardín</option>
-                <option value="5" <?php echo ($categoria == '5') ? 'selected' : ''; ?>>Otros</option>
-                <option value="" disabled <?php echo empty($categoria) ? 'selected' : ''; ?>>Elegir subcategoría</option>
-                <option value="6" <?php echo ($categoria == '6') ? 'selected' : ''; ?>>Acuáticas</option>
-                <option value="7" <?php echo ($categoria == '7') ? 'selected' : ''; ?>>Arbustos</option>
-                <option value="8" <?php echo ($categoria == '8') ? 'selected' : ''; ?>>Aromáticas</option>
-                <option value="9" <?php echo ($categoria == '9') ? 'selected' : ''; ?>>Bulbos</option>
-                <option value="10" <?php echo ($categoria == '10') ? 'selected' : ''; ?>>Aglaonemas</option>
-                <option value="11" <?php echo ($categoria == '11') ? 'selected' : ''; ?>>Alocasias</option>
-                <option value="12" <?php echo ($categoria == '12') ? 'selected' : ''; ?>>Calatheas</option>
-                <option value="13" <?php echo ($categoria == '13') ? 'selected' : ''; ?>>Colgantes</option>
-                <option value="14" <?php echo ($categoria == '14') ? 'selected' : ''; ?>>Macetas de Barro</option>
-                <option value="15" <?php echo ($categoria == '15') ? 'selected' : ''; ?>>Macetas EcoFriendly</option>
-                <option value="16" <?php echo ($categoria == '16') ? 'selected' : ''; ?>>Macetas de Plástico</option>
-                <option value="17" <?php echo ($categoria == '17') ? 'selected' : ''; ?>>Abono</option>
-                <option value="18" <?php echo ($categoria == '18') ? 'selected' : ''; ?>>Accesorios Riego</option>
-                <option value="19" <?php echo ($categoria == '19') ? 'selected' : ''; ?>>Herramientas</option>
-                <option value="20" <?php echo ($categoria == '20') ? 'selected' : ''; ?>>Insecticidas</option>
+                <option value="" disabled <?php echo (empty($res[3]) ? 'selected' : ''); ?>>Elegir categoría</option>
+                <?php
+                // Iterar sobre las categorías y generar las opciones del desplegable
+                foreach($categorias as $categoria) {
+                    echo '<option value="'.$categoria['codigo'].'" '.($res[3] == $categoria['codigo'] ? 'selected' : '').'>'.$categoria['nombre'].'</option>';
+                }
+                ?>
             </select>
 
             <label for="precio">Precio:</label>

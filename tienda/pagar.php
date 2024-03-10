@@ -7,6 +7,11 @@ require_once ("templates/cabecera.php");
 
 $con = conectar_pdo();
 
+$rolesPermitidos = ['admin', 'empleado', 'usuario'];
+
+// Verificar autenticación y roles permitidos
+verificarAutenticacion($rolesPermitidos);
+
 ?>
 
 <div class="row">

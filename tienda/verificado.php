@@ -16,6 +16,11 @@
     $sentencia->execute();
     $usuario = $sentencia->fetch(PDO::FETCH_ASSOC);
     /*print_r($usuario);*/
+
+    $rolesPermitidos = ['admin', 'empleado', 'usuario'];
+
+    // Verificar autenticación y roles permitidos
+    verificarAutenticacion($rolesPermitidos);
 ?>
 
 <?php

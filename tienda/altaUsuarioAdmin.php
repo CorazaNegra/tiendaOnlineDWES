@@ -45,6 +45,11 @@
         $formato = "border: 2px solid red";
     }
 
+    $rolesPermitidos = ['admin'];
+
+    // Verificar autenticación y roles permitidos
+    verificarAutenticacion($rolesPermitidos);
+
     insertarClienteAdmin($con);
     
 ?>
@@ -82,7 +87,7 @@
                 <div class="form-group">
                     <label for="rol">Rol:</label>
                     <select name="rol" class="form-control" required>
-                        <option value="" disabled>Seleccionar rol</option>
+                        <option value="" disabled selected>Seleccionar rol</option>
                         <option value="admin" <?php echo ($rol === 'admin') ? 'selected' : ''; ?>>Admin</option>
                         <option value="usuario" <?php echo ($rol === 'usuario') ? 'selected' : ''; ?>>Usuario</option>
                         <option value="empleado" <?php echo ($rol === 'empleado') ? 'selected' : ''; ?>>Empleado</option>

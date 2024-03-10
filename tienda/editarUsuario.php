@@ -20,6 +20,11 @@
         echo "Error: " . $e->getMessage(); 
     }
 
+    $rolesPermitidos = ['admin', 'empleado', 'usuario'];
+
+    // Verificar autenticación y roles permitidos
+    verificarAutenticacion($rolesPermitidos);
+
     actualizarCliente($con);
 ?>
 

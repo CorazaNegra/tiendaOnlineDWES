@@ -15,6 +15,12 @@
     $enlaceCancelar = ($rol === 'admin') ? 'administrador.php' : 'empleadoUsuario.php';
     
     $con = conectar_pdo();
+
+    $rolesPermitidos = ['admin', 'empleado', 'usuario'];
+
+    // Verificar autenticación y roles permitidos
+    verificarAutenticacion($rolesPermitidos);
+
     bajaCliente($con);
 
 ?>

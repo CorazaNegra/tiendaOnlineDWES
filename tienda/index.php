@@ -67,32 +67,31 @@ buscarArticulosIndex($con);
     
         <?php
 
-            $categoria=isset($_GET['categoria']) ? $_GET['categoria'] : null;
+            $categoria = isset($_GET['categoria']) ? $_GET['categoria'] : null;
             $activo = 1;
             if($categoria){
-
-                $sentencia=$con->prepare("SELECT * FROM articulos 
-                        WHERE categoria IN 
-                            (SELECT codigo FROM categorias 
-                            WHERE (codigo = :categoria OR codCategoriaPadre = :categoria) AND activo = :activo) AND activo = :activo");
+                $sentencia = $con->prepare("SELECT * FROM articulos 
+                    WHERE categoria IN 
+                        (SELECT codigo FROM categorias 
+                        WHERE (codigo = :categoria OR codCategoriaPadre IN 
+                            (SELECT codigo FROM categorias WHERE codigo = :categoria AND activo = :activo)) AND activo = :activo) AND activo = :activo");
                 $sentencia->bindParam(':categoria', $categoria, PDO::PARAM_INT);
-                
-
             }else{
-                
-                $sentencia=$con->prepare("SELECT * FROM articulos WHERE activo = :activo");
-                
+                $sentencia = $con->prepare("SELECT * FROM articulos 
+                    WHERE activo = :activo AND categoria IN 
+                        (SELECT codigo FROM categorias 
+                        WHERE codCategoriaPadre IN 
+                            (SELECT codigo FROM categorias WHERE activo = :activo) AND activo = :activo)");
             }
-            
             $sentencia->bindParam(':activo', $activo, PDO::PARAM_INT);
             $sentencia->execute();
-            $listaProductos=$sentencia->fetchAll(PDO::FETCH_ASSOC);
-            //print_r($listaProductos);
-            
+            $listaProductos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+
             $resultados = (isset($_SESSION['indexBusqueda']) && !empty($_SESSION['indexBusqueda'])) ? $_SESSION['indexBusqueda'] : $listaProductos;
             $num_total_registros = count($resultados);
             $total_paginas = ceil($num_total_registros / $PAGS);
             $result_pagina = array_slice($resultados, $inicio, $PAGS);
+
         
         ?>
 
@@ -143,8 +142,8 @@ buscarArticulosIndex($con);
             <?php
                 if ($total_paginas > 1) {
                     for ($i = 1; $i <= $total_paginas; $i++) {
-                        $activo = ($i == $pagina) ? "class='activo'" : "";
-                        echo "<a href='index.php?pagina=$i' $activo>$i</a> ";
+                        $activo = ($i == $pagina) ? "style='color: black;'" : "style='color: #487317;'";
+                        echo "<a href='index.php?pagina=$i&categoria=$categoria' $activo>$i</a> ";
                     }
                 }
 
