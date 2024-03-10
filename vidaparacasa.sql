@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 25-02-2024 a las 17:21:42
+-- Tiempo de generación: 10-03-2024 a las 17:02:09
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.2.4
 
@@ -42,7 +42,7 @@ CREATE TABLE `articulos` (
 --
 
 INSERT INTO `articulos` (`codigo`, `nombre`, `descripcion`, `categoria`, `precio`, `imagen`, `activo`) VALUES
-('AAA00001', 'Juncus effusus Spiralis', 'Ampliamos nuestro catÃ¡logo de plantas de interior con este curioso junco de formas caprichosas y enrevesadas. El junco espiral tambiÃ©n llamado junco fino o junco de esteras es una planta de interior de esas que dan un toque, un punto de decoraciÃ³n discreto a un rincÃ³n sin vida. La Ãºnica pega en sus cuidados es el riego como luego veremos pero es una planta muy socorrida y a nuestro parecer elegante y muy estÃ©tica.', 6, 14.00, 'archivos/Juncus Effus Spiralis_150x150.jpg', 0),
+('AAA00001', 'Juncus effusus Spiralis', 'Ampliamos nuestro catÃ¡logo de plantas de interior con este curioso junco de formas caprichosas y enrevesadas. El junco espiral tambiÃ©n llamado junco fino o junco de esteras es una planta de interior de esas que dan un toque, un punto de decoraciÃ³n discreto a un rincÃ³n sin vida. La Ãºnica pega en sus cuidados es el riego como luego veremos pero es una planta muy socorrida y a nuestro parecer elegante y muy estÃ©tica.', 6, 14.00, 'archivos/Juncus Effus Spiralis_150x150.jpg', 1),
 ('AAA00002', 'Equisetum Japonicum', 'Se le conoce popularmente con otros nombres como: Colas de caballo, caÃ±ita de agua o junquillos. El Equisetum JapÃ³nicum se trata de un helecho que pudiera considerarse como el mÃ¡s antiguo del planeta, de la especie de los Equisetum. Esta especie puede llegar a medir entre 60 centÃ­metros, incluso puede alcanzar los 5 metros de altura.', 6, 17.00, 'archivos/Equisetum_japonicum_150x150.jpg', 1),
 ('AAA00003', 'Hippurus Vulgaris', 'La especie Hippuris Vulgaris pertenece a la familia de las plantaginÃ¡ceas, es decir, es de las plantas de jardÃ­n del gÃ©nero de las dicotiledÃ³neas, las cuales alcanzan la cifra de unas dos mil especies. Su forma de pino otorga una vista Ãºnica para tu jardÃ­n, sobre todo en ambientes donde se puede percibir su follaje.', 6, 7.00, 'archivos/Hippuris-Vulgaris_150X150.jpg', 0),
 ('BBB00001', 'Arbutus Unedo', 'el madroÃ±o mide de 4 a 10 m con un tronco rojizo mÃ¡s o menos cubierto de largas escamas grisÃ¡ceas, con ramas grises y ramillas abundantemente foliosas, pardo-rojizas, a menudo piloso-glandulosas. Las hojas son persistentes, de 8 por 3 cm, y son lanceoladas, lauroides, serradas o serruladas, de un verde brillante por el haz, mates por el envÃ©s, con pecÃ­olo de hasta 7â€“8 mm. Las inflorescencias se presentan en panÃ­culas colgantes, con raquis rojizo y brÃ¡cteas ovado-lanceoladas cupuliformes envolventes, rojizas.', 7, 172.00, 'archivos/Arbutus-unendo-150x150.jpg', 1),
@@ -106,28 +106,26 @@ CREATE TABLE `categorias` (
 --
 
 INSERT INTO `categorias` (`codigo`, `nombre`, `activo`, `codCategoriaPadre`) VALUES
-(1, 'plantasExterior', 1, NULL),
-(2, 'plantasInterior', 1, NULL),
-(3, 'macetas', 1, NULL),
-(4, 'accesoriosJardin', 1, NULL),
-(5, 'otros', 1, NULL),
-(6, 'acuaticas', 1, 1),
+(1, 'Plantas Exterior', 1, NULL),
+(2, 'Plantas Interior', 1, NULL),
+(3, 'Macetas', 1, NULL),
+(4, 'Accesorios Jardin', 1, NULL),
+(5, 'Otros', 1, NULL),
+(6, 'acuÃ¡ticas', 1, 1),
 (7, 'arbustos', 1, 1),
-(8, 'aromaticas', 1, 1),
+(8, 'aromÃ¡ticas', 1, 1),
 (9, 'bulbos', 1, 1),
 (10, 'aglaonemas', 1, 2),
 (11, 'alocasias', 1, 2),
 (12, 'calatheas', 1, 2),
 (13, 'colgantes', 1, 2),
-(14, 'macetaBarro', 1, 3),
-(15, 'macetaEcofriendly', 1, 3),
-(16, 'macetaPlastico', 1, 3),
+(14, 'maceta barro', 1, 3),
+(15, 'maceta ecofriendly', 1, 3),
+(16, 'maceta plÃ¡stico', 1, 3),
 (17, 'abono', 1, 4),
-(18, 'Accesorios Riego', 1, 4),
+(18, 'accesorios riego', 1, 4),
 (19, 'herramientas', 1, 4),
-(20, 'insecticidas', 1, 4),
-(22, 'peces de colores', 1, 1),
-(23, 'Peces de Estanque', 1, 1);
+(20, 'insecticidas', 1, 4);
 
 -- --------------------------------------------------------
 
@@ -144,6 +142,26 @@ CREATE TABLE `detallepedido` (
   `estado` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `detallepedido`
+--
+
+INSERT INTO `detallepedido` (`id`, `idPedido`, `codigoArticulo`, `precioUnitario`, `cantidad`, `estado`) VALUES
+(6, 62, 'AAA00002', 17.00, 1, 'Cancelado'),
+(7, 62, 'BBB00001', 172.00, 1, 'Cancelado'),
+(8, 62, 'BBB00002', 11.00, 1, 'Cancelado'),
+(9, 63, 'CCC00001', 15.00, 1, 'Cancelado'),
+(10, 63, 'OOO00002', 14.95, 1, 'Cancelado'),
+(11, 63, 'PPP00001', 54.95, 1, 'Cancelado'),
+(12, 64, 'CCC00001', 15.00, 1, 'Cancelado'),
+(13, 64, 'III00002', 26.95, 1, 'Cancelado'),
+(14, 65, 'BBB00001', 172.00, 1, 'Cancelado'),
+(15, 65, 'BBB00002', 11.00, 1, 'Cancelado'),
+(16, 65, 'BBB00003', 8.00, 1, 'Cancelado'),
+(17, 66, 'BBB00001', 172.00, 3, 'Cancelado'),
+(18, 67, 'AAA00001', 14.00, 1, 'Cancelado'),
+(19, 67, 'BBB00002', 11.00, 1, 'Cancelado');
+
 -- --------------------------------------------------------
 
 --
@@ -159,6 +177,18 @@ CREATE TABLE `pedidos` (
   `total` decimal(20,2) NOT NULL,
   `estado` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `pedidos`
+--
+
+INSERT INTO `pedidos` (`idPedido`, `claveTransaccion`, `paypalDatos`, `fecha`, `codUsuario`, `total`, `estado`) VALUES
+(62, 'ehfasj0i9r9ejsl00tcf3t5lbs', NULL, '2024-03-04 17:20:40', '21457890V', 200.00, 'Pago confirmado'),
+(63, 'ehfasj0i9r9ejsl00tcf3t5lbs', NULL, '2024-03-04 17:21:02', '21457890V', 84.90, 'Pago confirmado'),
+(64, 'ehfasj0i9r9ejsl00tcf3t5lbs', NULL, '2024-03-04 17:22:05', '74859612V', 41.95, 'Pago confirmado'),
+(65, 'r01d2ta6hnh22nep2o62pj432j', NULL, '2024-03-04 19:06:32', '21457890V', 191.00, 'Pago confirmado'),
+(66, 'r01d2ta6hnh22nep2o62pj432j', NULL, '2024-03-04 19:07:36', '33547895A', 516.00, 'Pago confirmado'),
+(67, 'cdpi8sgsg3fc9nrka0j96t7ebp', NULL, '2024-03-08 19:42:12', '33547895A', 25.00, 'Cancelado');
 
 -- --------------------------------------------------------
 
@@ -185,8 +215,9 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`dni`, `nombre`, `apellidos`, `direccion`, `localidad`, `provincia`, `telefono`, `email`, `rol`, `clave_usuario`, `activo`) VALUES
+('11111111H', 'Julian', 'Torres Rotas', 'avenida de los robles, 2213', 'Pasadena', 'California', '963852741', 'micorreo@gmail.com', 'usuario', '$2y$10$0VCZRt1iTpwZ6P9t7nzc4eANAGHWa00Lknz2q6D94xW3dDg4RC.ua', 1),
 ('21457890V', 'Jacinto', 'Torres Palacios', 'c/ Las Bayas, s/n', 'Pacheta', 'Murcia', '699977788', 'jacinto@sudominio.com', 'admin', '$2y$10$Vrd6OlDXtHAh3pNwBIezkuq4O1Dk1UA7qDeO0R/DJuY4iwAU.xCZO', 1),
-('33547895A', 'Pablo', 'Puentes Largos', 'Avenida de los robles, s/n', 'Pasadena', 'Albacete', '698521748', 'pablo@sudominio.com', 'usuario', '$2y$10$Uo1FMjGtPRPGuoWSZS5bRuZzALpQN2TSexd2Wovp3v1iQU61A58OG', 1),
+('33547895A', 'Pablo', 'Puentes Largos', 'Avenida de los robles, s/n', 'Pasadena', 'Albacete', '698521748', 'pablo@sudominio.com', 'usuario', '$2y$10$Eb4Cby.0feRg1ZgHCrsyI.u98J38MlUC8hDUadxRfsSYbwEC7ttde', 1),
 ('74859612V', 'Helena', 'Carrera Corta', 'Camino de los arroyos, s/n', 'Benajuzar', 'Alicante', '698741325', 'helena@sudominio.es', 'empleado', '$2y$10$mtE687.hIblR39DH8/uUpe9OJ0JNY9YZpAPFAvWPofjngEC3KXq6.', 1);
 
 --
@@ -238,19 +269,19 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `categorias`
 --
 ALTER TABLE `categorias`
-  MODIFY `codigo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `codigo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT de la tabla `detallepedido`
 --
 ALTER TABLE `detallepedido`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT de la tabla `pedidos`
 --
 ALTER TABLE `pedidos`
-  MODIFY `idPedido` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+  MODIFY `idPedido` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- Restricciones para tablas volcadas
